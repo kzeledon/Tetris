@@ -3,6 +3,7 @@ package com.example.karizp.tetris;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,11 +31,35 @@ public class TetrisActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tetris);
 
+        final Handler handler = new Handler();
+
         juegoTetris=new TableroTetris();
         createTable();
-        //juegoTetris.getMatrizBlock()[14][13]=5;
         juegoTetris.generarPieza();
         updateTable();
+
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+
+
+                if(juegoTetris.getPiezaActual().isLanded())
+                {
+                    juegoTetris.generarPieza();
+                    Log.i("tablero", " se creo nueva pieza");
+                }
+                else
+                {
+                    juegoTetris.piezaCayendo();
+                }
+
+                updateTable();
+
+                handler.postDelayed(this,1000);
+            }
+        };
+
+        handler.post(run);
 
         //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tetris_song);
         //mediaPlayer.start();

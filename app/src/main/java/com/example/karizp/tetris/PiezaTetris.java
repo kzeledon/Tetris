@@ -6,7 +6,7 @@ import java.util.Random;
  * Created by karizp on 06/03/2018.
  */
 
-public class PiezaTetris {
+public class PiezaTetris implements Cloneable{
     private int[][] form;
     private int[][] actualform;
     private int color;
@@ -14,6 +14,7 @@ public class PiezaTetris {
     //la posicion se toma del bloque superior izquierdo de la figura
     private int[] topLeft=new int[2];
     private int[] potential=new int[2];
+    private boolean landed;
 
     public PiezaTetris(int[][] form, int[][][]rotations,int color)
     {
@@ -23,7 +24,22 @@ public class PiezaTetris {
         topLeft[0]=0;
         topLeft[1]=6;
         this.color=color;
+        landed=false;
 
+    }
+
+    public Object clone()
+    {
+        Object clone = null;
+        try
+        {
+            clone = super.clone();
+        }
+        catch(CloneNotSupportedException e)
+        {
+            // No deberia ocurrir
+        }
+        return clone;
     }
 
     public void pintarPieza(int color)
@@ -38,6 +54,14 @@ public class PiezaTetris {
                 }
             }
         }
+    }
+
+    public boolean isLanded() {
+        return landed;
+    }
+
+    public void setLanded(boolean landed) {
+        this.landed = landed;
     }
 
     public int[][] getActualform() {
@@ -67,6 +91,8 @@ public class PiezaTetris {
     public int[][] getForm() {
         return form;
     }
+
+
 
     public void setForm(int[][] form) {
         this.form = form;
