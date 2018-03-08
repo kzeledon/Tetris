@@ -2,6 +2,8 @@ package com.example.karizp.tetris;
 
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +27,8 @@ public class TetrisActivity  extends AppCompatActivity {
 
     private GridLayout gridTablero;
     private TableroTetris juegoTetris;
-
+    private Thread t1 = null;
+    private Thread t2 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +36,11 @@ public class TetrisActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_tetris);
 
         final Handler handler = new Handler();
+        final Handler handlerUpdate = new Handler();
 
         juegoTetris=new TableroTetris();
         createTable();
         juegoTetris.generarPieza();
-        updateTable();
 
         Runnable run = new Runnable() {
             @Override
@@ -46,21 +49,30 @@ public class TetrisActivity  extends AppCompatActivity {
 
                 if(juegoTetris.getPiezaActual().isLanded())
                 {
+                    juegoTetris.FillLine();
                     juegoTetris.generarPieza();
-                    Log.i("tablero", " se creo nueva pieza");
                 }
                 else
                 {
                     juegoTetris.piezaCayendo();
                 }
 
-                updateTable();
 
                 handler.postDelayed(this,600);
             }
         };
 
         handler.post(run);
+
+
+        Runnable r2 = new Runnable() {
+            @Override
+            public void run() {
+                updateTable();
+                handlerUpdate.postDelayed(this,100);
+            }
+        };
+        handlerUpdate.post(r2);
 
         //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tetris_song);
         //mediaPlayer.start();
@@ -165,4 +177,10 @@ public class TetrisActivity  extends AppCompatActivity {
     }
 
 
+
+
+
 }
+
+
+

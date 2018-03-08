@@ -19,10 +19,12 @@ public class TableroTetris {
     private PiezaTetris piezaActual;
     private int formaActual;
     private int rotActual;
+    private int puntuacion;
 
     TableroTetris(){
         this.gameOver = false;
         this.matrizBlock = new int[row][col];
+        puntuacion=0;
 
         for(int i=0;i<row;i++)
         {
@@ -97,7 +99,8 @@ public class TableroTetris {
         Random r = new Random();
         int i = r.nextInt(7 ) ;
 
-        i=6;
+
+        Log.w("Forma"," "+i);
 
         piezaActual=(PiezaTetris) piezasJuego.get(i).clone(); //aqui podria ser clone
         piezaActual.setLanded(false);
@@ -151,6 +154,62 @@ public class TableroTetris {
                 }
             }
         }
+
+    }
+
+    public void FillLine()
+    {
+        boolean isFilled=true;
+        int i;
+        for(i=21;i>=0;i--)
+        {
+            for (int j = 0; j < col; j++) {
+                if (matrizBlock[i][j] == 0) {
+                    isFilled = false;
+                    break;
+                } else {
+                    isFilled = true;
+                }
+            }
+            if (isFilled)
+            {
+                break;
+            }
+        }
+
+        if(isFilled)
+        {
+            puntuacion+=1400;
+            clearLine(i);
+            FillLine();
+        }
+
+    }
+
+    public void clearLine(int i)
+    {
+        //clear line
+        for(int j=0;j<col;j++)
+        {
+            matrizBlock[i][j]=0;
+        }
+        //paint line
+        if(i!=0) {
+            for (int j = i - 1; j >= 0; j--) {
+                for (int k = 0; k < col; k++) {
+                    if (matrizBlock[j][k] != 0) {
+                        if (matrizBlock[j+1][k]==0)
+                        {
+                            matrizBlock[j+1][k]=matrizBlock[j][k];
+                            matrizBlock[j][k]=0;
+                        }
+                    }
+                }
+
+            }
+        }
+
+
 
     }
 
@@ -219,9 +278,16 @@ public class TableroTetris {
             {
                 if(potentialShape[i][j]!=0)
                 {
-                    if (matrizBlock[i + topLeft[0]][j + topLeft[1]] != 0) {
-                        spaceTaken = true;
-                        break;
+                    if(i+topLeft[0]<21 && j+topLeft[1]<13)
+                    {
+                        if (matrizBlock[i + topLeft[0]][j + topLeft[1]] != 0) {
+                            spaceTaken = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        spaceTaken=true;
                     }
                 }
             }
@@ -307,42 +373,50 @@ public class TableroTetris {
     public void moverPiezaAbajo()
     {
         int[] newPos = piezaActual.getTopLeft().clone();
-        newPos[0]++;
-        piezaActual.setPotential(newPos);
+
         boolean spaceTaken = false;
         int num;
 
         num=newPos[0]+piezaActual.getActualform().length;
-        if (!(num==23)) {
 
-            quitarPieza();
+        quitarPieza();
 
-            for (int i = 0; i < piezaActual.getActualform().length; i++) {
-                for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
-                    if (piezaActual.getActualform()[i][j] != 0) {
+        for(int i=row-piezaActual.getActualform().length; i>=0;i--)
+        {
+            newPos[0]=i;
+            piezaActual.setPotential(newPos);
+            for (int j = 0; j < piezaActual.getActualform().length; j++)
+            {
+                for (int k = 0; k < piezaActual.getActualform()[j].length; k++)
+                {
+                    if (piezaActual.getActualform()[j][k] != 0) {
 
-                        if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
-                            spaceTaken = true;
+                        if (matrizBlock[j + piezaActual.getPotential()[0]][k + piezaActual.getPotential()[1]] != 0)
+                        {
+                            spaceTaken=true;
                             break;
+                        }
+                        else
+                        {
+                            spaceTaken=false;
                         }
                     }
                 }
+                if(spaceTaken)
+                    break;
             }
-            num=newPos[0]+piezaActual.getActualform().length;
-            if (!spaceTaken && num<23)
-            {
-                piezaActual.setTopLeft(piezaActual.getPotential().clone());
-            }
-            else
+            if(!spaceTaken)
             {
                 piezaActual.setLanded(true);
+                piezaActual.setTopLeft(piezaActual.getPotential().clone());
+                break;
             }
-            pintarPieza();
         }
-        else
-        {
-            piezaActual.setLanded(true);
-        }
+
+        pintarPieza();
+
+
+
     }
 
 
