@@ -30,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onBtnMoveLeft"
             android:text="Izq" />
 
         <Button
@@ -37,6 +38,7 @@
             android:layout_width="103dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onBtnMoveDown"
             android:text="ABAJO" />
 
         <Button
@@ -44,6 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onBtnMoveRight"
             android:text="Der" />
 
         <Button
@@ -52,6 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="80dp"
             android:layout_weight="1"
+            android:onClick="onBtnRotate"
             android:paddingLeft="0dp"
             android:text="Rotar" />
     </LinearLayout>

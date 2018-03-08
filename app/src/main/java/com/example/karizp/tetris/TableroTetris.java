@@ -17,6 +17,8 @@ public class TableroTetris {
     private ArrayList<PiezaTetris> piezasJuego;
 
     private PiezaTetris piezaActual;
+    private int formaActual;
+    private int rotActual;
 
     TableroTetris(){
         this.gameOver = false;
@@ -52,13 +54,13 @@ public class TableroTetris {
 
         int[][] ZForm={{1,1,0},
                        {0,1,1}};
-        int[][][] ZRot={{{1,1,0},{0,1,1}},{{0,1},{1,1},{1,0}}};
+        int[][][] ZRot={{{1,1,0},{0,1,1}},{{0,1},{1,1},{1,0}},{{1,1,0},{0,1,1}},{{0,1},{1,1},{1,0}}};
 
         PiezaTetris Z= new PiezaTetris(ZForm,ZRot,7);
 
         int[][] SForm={{0,1,1},
                        {1,1,0}};
-        int[][][] SRot={{{0,1,1},{1,1,0}},{{1,0},{1,1},{0,1}}};
+        int[][][] SRot={{{0,1,1},{1,1,0}},{{1,0},{1,1},{0,1}},{{0,1,1},{1,1,0}},{{1,0},{1,1},{0,1}}};
 
         PiezaTetris S= new PiezaTetris(SForm,SRot,5);
 
@@ -72,7 +74,7 @@ public class TableroTetris {
                        {1},
                        {1},
                        {1}};
-        int[][][] IRot={{{1},{1},{1},{1}},{{1,1,1,1}}};
+        int[][][] IRot={{{1},{1},{1},{1}},{{1,1,1,1}},{{1},{1},{1},{1}},{{1,1,1,1}}};
 
         PiezaTetris I= new PiezaTetris(IForm,IRot,2);
 
@@ -93,9 +95,14 @@ public class TableroTetris {
     public void generarPieza()
     {
         Random r = new Random();
-        int i = r.nextInt(7 - 1) + 1;
+        int i = r.nextInt(7 ) ;
+
+        i=6;
+
         piezaActual=(PiezaTetris) piezasJuego.get(i).clone(); //aqui podria ser clone
         piezaActual.setLanded(false);
+        rotActual=0;
+        formaActual=i;
 
         for(int j=0;j<piezaActual.getForm().length;j++)
         {
@@ -114,11 +121,11 @@ public class TableroTetris {
 
     public void quitarPieza()
     {
-        for(int j=0;j<piezaActual.getForm().length;j++)
+        for(int j=0;j<piezaActual.getActualform().length;j++)
         {
-            for(int k=0;k<piezaActual.getForm()[j].length;k++)
+            for(int k=0;k<piezaActual.getActualform()[j].length;k++)
             {
-                if(piezaActual.getForm()[j][k]!=0)
+                if(piezaActual.getActualform()[j][k]!=0)
                 {
                     int row=piezaActual.getTopLeft()[0];
                     int col=piezaActual.getTopLeft()[1];
@@ -131,11 +138,11 @@ public class TableroTetris {
 
     public void pintarPieza()
     {
-        for(int j=0;j<piezaActual.getForm().length;j++)
+        for(int j=0;j<piezaActual.getActualform().length;j++)
         {
-            for(int k=0;k<piezaActual.getForm()[j].length;k++)
+            for(int k=0;k<piezaActual.getActualform()[j].length;k++)
             {
-                if(piezaActual.getForm()[j][k]!=0)
+                if(piezaActual.getActualform()[j][k]!=0)
                 {
                     int row=piezaActual.getTopLeft()[0];
                     int col=piezaActual.getTopLeft()[1];
@@ -144,6 +151,7 @@ public class TableroTetris {
                 }
             }
         }
+
     }
 
     public void piezaCayendo() {
@@ -154,24 +162,24 @@ public class TableroTetris {
 
         quitarPieza();
 
-        int num=0;
+        int num=newPos[0]+piezaActual.getActualform().length;
+        if (!(num==23)) {
         //comprueba si el espacio donde se va a mover esta ocupado
         for (int i = 0; i < piezaActual.getActualform().length; i++) {
             for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
                 if (piezaActual.getActualform()[i][j] != 0) {
                     num = i + piezaActual.getPotential()[0];
-                    Log.i("tablero", " " + num);
                     if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
                         spaceTaken = true;
                         break;
-                    }else if(num==21)
-                    {
+                    } else if (num == 21) {
                         piezaActual.setTopLeft(piezaActual.getPotential().clone());
                         spaceTaken = true;
                     }
                 }
             }
         }
+
         Log.i("tablero", " " + spaceTaken);
         if (!spaceTaken) {
             piezaActual.setTopLeft(piezaActual.getPotential().clone());
@@ -181,6 +189,160 @@ public class TableroTetris {
             piezaActual.setLanded(true);
         }
         pintarPieza();
+        }
+    }
+
+    public void rotar()
+    {
+        boolean spaceTaken=false;
+        int[] topLeft = piezaActual.getTopLeft();
+        int[][] potentialShape=null;
+        switch(rotActual){
+            case 0:
+                potentialShape =  piezasJuego.get(formaActual).getRotations()[1];
+                break;
+            case 1:
+                potentialShape =  piezasJuego.get(formaActual).getRotations()[2];
+                break;
+            case 2:
+                potentialShape =  piezasJuego.get(formaActual).getRotations()[3];
+                break;
+            case 3:
+                potentialShape =  piezasJuego.get(formaActual).getRotations()[0];
+                break;
+        }
+
+        quitarPieza();
+        for (int i=0; i<potentialShape.length;i++)
+        {
+            for(int j=0; j<potentialShape[i].length;j++)
+            {
+                if(potentialShape[i][j]!=0)
+                {
+                    if (matrizBlock[i + topLeft[0]][j + topLeft[1]] != 0) {
+                        spaceTaken = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(!spaceTaken)
+        {
+            piezaActual.setActualform(potentialShape);
+            rotActual++;
+            if(rotActual==4)
+                rotActual=0;
+        }
+        pintarPieza();
+        Log.w("Figura","Pinte Figura rotada");
+
+    }
+
+    public void moverPiezaDer()
+    {
+        int[] newPos = piezaActual.getTopLeft().clone();
+        newPos[1]++;
+        piezaActual.setPotential(newPos);
+        boolean spaceTaken = false;
+        int num;
+
+        num=newPos[1]+piezaActual.getActualform()[0].length;
+        if (!(num==15)) {
+
+            quitarPieza();
+
+            for (int i = 0; i < piezaActual.getActualform().length; i++) {
+                for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
+                    if (piezaActual.getActualform()[i][j] != 0) {
+                        num = j + piezaActual.getPotential()[0];
+                        if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
+                            spaceTaken = true;
+                            break;
+                        } else if (num == 12) {
+                            piezaActual.setTopLeft(piezaActual.getPotential().clone());
+                            spaceTaken = true;
+                        }
+                    }
+                }
+            }
+            if (!spaceTaken) {
+                piezaActual.setTopLeft(piezaActual.getPotential().clone());
+            }
+            pintarPieza();
+        }
+    }
+
+    public void moverPiezaIzq()
+    {
+        int[] newPos = piezaActual.getTopLeft().clone();
+        newPos[1]--;
+        piezaActual.setPotential(newPos);
+        boolean spaceTaken = false;
+        int num;
+
+        num=newPos[1];
+        if (!(num==-1)) {
+
+            quitarPieza();
+
+            for (int i = 0; i < piezaActual.getActualform().length; i++) {
+                for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
+                    if (piezaActual.getActualform()[i][j] != 0) {
+
+                        if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
+                            spaceTaken = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!spaceTaken) {
+                piezaActual.setTopLeft(piezaActual.getPotential().clone());
+            }
+            pintarPieza();
+        }
+    }
+
+    public void moverPiezaAbajo()
+    {
+        int[] newPos = piezaActual.getTopLeft().clone();
+        newPos[0]++;
+        piezaActual.setPotential(newPos);
+        boolean spaceTaken = false;
+        int num;
+
+        num=newPos[0]+piezaActual.getActualform().length;
+        if (!(num==23)) {
+
+            quitarPieza();
+
+            for (int i = 0; i < piezaActual.getActualform().length; i++) {
+                for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
+                    if (piezaActual.getActualform()[i][j] != 0) {
+
+                        if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
+                            spaceTaken = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            num=newPos[0]+piezaActual.getActualform().length;
+            if (!spaceTaken && num<23)
+            {
+                piezaActual.setTopLeft(piezaActual.getPotential().clone());
+            }
+            else
+            {
+                piezaActual.setLanded(true);
+            }
+            pintarPieza();
+        }
+        else
+        {
+            piezaActual.setLanded(true);
+        }
     }
 
 

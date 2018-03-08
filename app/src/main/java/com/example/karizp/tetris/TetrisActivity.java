@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -55,7 +56,7 @@ public class TetrisActivity  extends AppCompatActivity {
 
                 updateTable();
 
-                handler.postDelayed(this,1000);
+                handler.postDelayed(this,600);
             }
         };
 
@@ -64,6 +65,26 @@ public class TetrisActivity  extends AppCompatActivity {
         //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tetris_song);
         //mediaPlayer.start();
 
+    }
+
+    public void onBtnMoveRight(View view)
+    {
+        juegoTetris.moverPiezaDer();
+    }
+
+    public void onBtnMoveLeft(View view)
+    {
+        juegoTetris.moverPiezaIzq();
+    }
+
+    public void onBtnMoveDown(View view)
+    {
+        juegoTetris.moverPiezaAbajo();
+    }
+
+    public void onBtnRotate(View view)
+    {
+        juegoTetris.rotar();
     }
 
     public void createTable()
