@@ -1,5 +1,6 @@
 package com.example.karizp.tetris;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -7,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 
 /**
@@ -29,6 +32,7 @@ public class TetrisActivity  extends AppCompatActivity {
     private TableroTetris juegoTetris;
     private Thread t1 = null;
     private Thread t2 = null;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,19 +50,21 @@ public class TetrisActivity  extends AppCompatActivity {
             @Override
             public void run() {
 
+                if(!juegoTetris.isGameOver()) {
+                    if (juegoTetris.getPiezaActual().isLanded()) {
+                        juegoTetris.FillLine();
+                        juegoTetris.generarPieza();
+                    } else {
+                        juegoTetris.piezaCayendo();
+                    }
 
-                if(juegoTetris.getPiezaActual().isLanded())
-                {
-                    juegoTetris.FillLine();
-                    juegoTetris.generarPieza();
+                    if (juegoTetris.isGameOver()) {
+                        gameOver();
+                    }
+
+
+                    handler.postDelayed(this, 600);
                 }
-                else
-                {
-                    juegoTetris.piezaCayendo();
-                }
-
-
-                handler.postDelayed(this,600);
             }
         };
 
@@ -74,10 +80,31 @@ public class TetrisActivity  extends AppCompatActivity {
         };
         handlerUpdate.post(r2);
 
-        //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tetris_song);
-        //mediaPlayer.start();
+        mediaPlayer = MediaPlayer.create(this, R.raw.tetris_song);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
 
     }
+
+    public void gameOver()
+    {
+        LinearLayout lGame = (LinearLayout)findViewById(R.id.layoutGameOver);
+        lGame.setVisibility(View.VISIBLE);
+        mediaPlayer.stop();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                Intent i = new Intent(TetrisActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        }, 3000);
+
+
+    }
+
+
 
     public void onBtnMoveRight(View view)
     {
@@ -120,9 +147,14 @@ public class TetrisActivity  extends AppCompatActivity {
 
     void updateTable()
     {
+        TextView tv = (TextView)findViewById(R.id.txtPuntuacion);
+        String text = "Puntuación "+juegoTetris.getPuntuacion();
+
+        tv.setText(text);
+
         gridTablero = (GridLayout) findViewById(R.id.tablero);
-        int row=22;
-        int col=14;
+        int row=gridTablero.getRowCount();
+        int col=gridTablero.getColumnCount();
 
         for(int i=0;i<row;i++)
         {
@@ -131,7 +163,7 @@ public class TetrisActivity  extends AppCompatActivity {
                     int[][] matriz = juegoTetris.getMatrizBlock();
 
                     int color=matriz[i][j];
-                    ImageView image = (ImageView) gridTablero.getChildAt(i*14+j);
+                    ImageView image = (ImageView) gridTablero.getChildAt(i*col+j);
                     Log.i("Hijos", " "+gridTablero.getChildCount());
 
                     if(image!=null)

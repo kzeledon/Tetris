@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class TableroTetris {
     private int row=22;
-    private int col=14;
+    private int col=12;
     private boolean gameOver;
     private int[][] matrizBlock;
     private ArrayList<PiezaTetris> piezasJuego;
@@ -116,10 +116,26 @@ public class TableroTetris {
                     int row=piezaActual.getTopLeft()[0];
                     int col=piezaActual.getTopLeft()[1];
 
-                    matrizBlock[row+j][col+k]=piezaActual.getColor();
+                    if(matrizBlock[row+j][col+k]==0)
+                        matrizBlock[row+j][col+k]=piezaActual.getColor();
+                    else {
+                        gameOver = true;
+                        break;
+                    }
                 }
             }
+            if(gameOver)
+                break;
         }
+    }
+
+
+    public int getPuntuacion() {
+        return puntuacion;
+    }
+
+    public void setPuntuacion(int puntuacion) {
+        this.puntuacion = puntuacion;
     }
 
     public void quitarPieza()
@@ -161,7 +177,7 @@ public class TableroTetris {
     {
         boolean isFilled=true;
         int i;
-        for(i=21;i>=0;i--)
+        for(i=row-1;i>=0;i--)
         {
             for (int j = 0; j < col; j++) {
                 if (matrizBlock[i][j] == 0) {
@@ -222,7 +238,7 @@ public class TableroTetris {
         quitarPieza();
 
         int num=newPos[0]+piezaActual.getActualform().length;
-        if (!(num==23)) {
+        if (!(num==row+1)) {
         //comprueba si el espacio donde se va a mover esta ocupado
         for (int i = 0; i < piezaActual.getActualform().length; i++) {
             for (int j = 0; j < piezaActual.getActualform()[i].length; j++) {
@@ -231,7 +247,7 @@ public class TableroTetris {
                     if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
                         spaceTaken = true;
                         break;
-                    } else if (num == 21) {
+                    } else if (num == row-1) {
                         piezaActual.setTopLeft(piezaActual.getPotential().clone());
                         spaceTaken = true;
                     }
@@ -278,7 +294,7 @@ public class TableroTetris {
             {
                 if(potentialShape[i][j]!=0)
                 {
-                    if(i+topLeft[0]<21 && j+topLeft[1]<13)
+                    if(i+topLeft[0]<row-1 && j+topLeft[1]<col-1)
                     {
                         if (matrizBlock[i + topLeft[0]][j + topLeft[1]] != 0) {
                             spaceTaken = true;
@@ -314,7 +330,7 @@ public class TableroTetris {
         int num;
 
         num=newPos[1]+piezaActual.getActualform()[0].length;
-        if (!(num==15)) {
+        if (!(num==col+1)) {
 
             quitarPieza();
 
@@ -325,7 +341,7 @@ public class TableroTetris {
                         if (matrizBlock[i + piezaActual.getPotential()[0]][j + piezaActual.getPotential()[1]] != 0) {
                             spaceTaken = true;
                             break;
-                        } else if (num == 12) {
+                        } else if (num == col-2) {
                             piezaActual.setTopLeft(piezaActual.getPotential().clone());
                             spaceTaken = true;
                         }
@@ -374,14 +390,16 @@ public class TableroTetris {
     {
         int[] newPos = piezaActual.getTopLeft().clone();
 
-        boolean spaceTaken = false;
-        int num;
+        boolean spaceTaken = false,foundRow=false;
+        int num,rowFree;
 
-        num=newPos[0]+piezaActual.getActualform().length;
+        num=newPos[0]+piezaActual.getActualform().length+1;
 
         quitarPieza();
 
-        for(int i=row-piezaActual.getActualform().length; i>=0;i--)
+        rowFree=row-piezaActual.getActualform().length;
+
+        for(int i=rowFree; i>=0;i--)
         {
             newPos[0]=i;
             piezaActual.setPotential(newPos);

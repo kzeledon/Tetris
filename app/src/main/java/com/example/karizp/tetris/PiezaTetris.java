@@ -22,7 +22,7 @@ public class PiezaTetris implements Cloneable{
         this.rotations=rotations;
         actualform=form;
         topLeft[0]=0;
-        topLeft[1]=6;
+        topLeft[1]=5;
         this.color=color;
         landed=false;
 
